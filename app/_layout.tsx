@@ -2,8 +2,8 @@ import tamaguiConfig from '@/tamagui.config';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Modal, Pressable, StyleSheet, Text } from 'react-native';
 import 'react-native-reanimated';
 import { TamaguiProvider } from 'tamagui';
 
@@ -25,9 +25,20 @@ function AppNavigator() {
   const pathname = usePathname();
   const { isAuthenticated, signOut } = useAuth();
   const [menuVisible, setMenuVisible] = useState(false);
+  const [sideMenuVisible, setSideMenuVisible] = useState(false);
+  const sideMenuAnimatedValue = useRef(new Animated.Value(-300)).current;
+
+  useEffect(() => {
+    Animated.timing(sideMenuAnimatedValue, {
+      toValue: sideMenuVisible ? 0 : -300,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [sideMenuVisible, sideMenuAnimatedValue]);
 
   useEffect(() => {
     setMenuVisible(false);
+    setSideMenuVisible(false);
   }, [pathname]);
 
   const openMenu = () => {
@@ -36,6 +47,14 @@ function AppNavigator() {
 
   const closeMenu = () => {
     setMenuVisible(false);
+  };
+
+  const openSideMenu = () => {
+    setSideMenuVisible(true);
+  };
+
+  const closeSideMenu = () => {
+    setSideMenuVisible(false);
   };
 
   const handleNavigate = (path: '/profile' | '/settings') => {
@@ -54,7 +73,18 @@ function AppNavigator() {
       <ThemeProvider value={DefaultTheme}>
         <Stack
           screenOptions={{
-            headerTitle: 'App Payments',
+            headerTitle: () => (
+              <Pressable
+                testID="app-title"
+                accessibilityRole="button"
+                accessibilityLabel="Abrir menu lateral"
+                onPress={openSideMenu}
+              >
+                <Text style={{ fontSize: 18, fontWeight: '600', color: colors.text }}>
+                  App Payments
+                </Text>
+              </Pressable>
+            ),
             headerTitleAlign: 'left',
             headerStyle: { backgroundColor: colors.background },
             headerTintColor: colors.text,
@@ -93,6 +123,34 @@ function AppNavigator() {
                 },
               ]}
             >
+              <MenuItem label="Perfil" onPress={() => handleNavigate('/profile')} />
+              <MenuItem label="Configurações" onPress={() => handleNavigate('/settings')} />
+              {isAuthenticated ? <MenuItem label="Sair" danger onPress={handleSignOut} /> : null}
+            </Pressable>
+          </Pressable>
+        </Modal>
+
+        <Modal transparent animationType="none" visible={sideMenuVisible} onRequestClose={closeSideMenu}>
+          <Pressable style={styles.sideMenuBackdrop} onPress={closeSideMenu}>
+            <Pressable
+              testID="side-menu"
+              onPress={() => {}}
+              style={[
+                styles.sideMenu,
+                {
+                  backgroundColor: colors.background,
+                  borderColor: '#e5e7eb',
+                  transform: [{ translateX: sideMenuAnimatedValue }],
+                },
+              ]}
+            >
+              <Pressable
+                onPress={closeSideMenu}
+                style={styles.sideMenuClose}
+                testID="side-menu-close"
+              >
+                <Text style={{ fontSize: 28, color: colors.text }}>×</Text>
+              </Pressable>
               <MenuItem label="Perfil" onPress={() => handleNavigate('/profile')} />
               <MenuItem label="Configurações" onPress={() => handleNavigate('/settings')} />
               {isAuthenticated ? <MenuItem label="Sair" danger onPress={handleSignOut} /> : null}
@@ -150,5 +208,21 @@ const styles = StyleSheet.create({
   },
   menuItemDanger: {
     color: '#d14343',
+  },
+  sideMenuBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  sideMenu: {
+    flex: 1,
+    width: '75%',
+    maxWidth: 300,
+    borderRightWidth: 1,
+    paddingTop: 16,
+  },
+  sideMenuClose: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    alignItems: 'flex-start',
   },
 });

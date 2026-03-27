@@ -14,11 +14,13 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
   const isWeb = Platform.OS === 'web';
   const colors = Colors.light;
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { isAuthenticated, isLoading: isRestoringSession, signIn } = useAuth();
 
   const [username, setUsername] = useState('');
@@ -106,7 +108,7 @@ export default function LoginScreen() {
     <KeyboardAvoidingView
       testID="login-screen"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}
     >
       <ScrollView
         testID="login-scroll"
