@@ -1,7 +1,15 @@
 import { AuthError, LoginCredentials, LoginResponse } from '@/services/auth-model';
 import { httpPost } from '@/services/http-client';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
+function normalizeEnvUrl(value?: string): string | undefined {
+  if (!value) {
+    return undefined;
+  }
+
+  return value.trim().replace(/^['\"]|['\"]$/g, '');
+}
+
+const API_URL = normalizeEnvUrl(process.env.EXPO_PUBLIC_API_URL);
 
 export async function login(credentials: LoginCredentials): Promise<LoginResponse> {
   try {

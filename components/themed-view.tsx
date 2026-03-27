@@ -1,4 +1,4 @@
-import { View, type ViewProps } from 'react-native';
+import { type ViewProps, View } from 'tamagui';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 

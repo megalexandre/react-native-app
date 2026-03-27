@@ -1,9 +1,7 @@
 import { Redirect } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import { Text, YStack } from 'tamagui';
 
 import { useAuth } from '@/components/auth-provider';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 
 export default function ProfileScreen() {
   const { isAuthenticated, isLoading, session } = useAuth();
@@ -17,18 +15,12 @@ export default function ProfileScreen() {
   }
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title">Perfil</ThemedText>
-      <ThemedText>Usuário: {session?.user?.username ?? '-'}</ThemedText>
-      <ThemedText>Nome: {session?.user?.name ?? '-'}</ThemedText>
-    </ThemedView>
+    <YStack flex={1} padding={20} gap={12}>
+      <Text fontSize={32} lineHeight={32} fontWeight="700">
+        Perfil
+      </Text>
+      <Text>Usuário: {session?.user?.username ?? '-'}</Text>
+      <Text>Nome: {session?.user?.name ?? '-'}</Text>
+    </YStack>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    gap: 12,
-  },
-});

@@ -2,14 +2,16 @@ import tamaguiConfig from '@/tamagui.config';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Modal, Pressable, StyleSheet, Text } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, Modal, PanResponder, Pressable, StyleSheet, Text, View } from 'react-native';
 import 'react-native-reanimated';
 import { TamaguiProvider } from 'tamagui';
 
 import { AuthProvider, useAuth } from '@/components/auth-provider';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
+
+const SIDE_MENU_WIDTH = 300;
 
 export default function RootLayout() {
   return (
@@ -23,18 +25,11 @@ function AppNavigator() {
   const colors = Colors['light'];
   const router = useRouter();
   const pathname = usePathname();
+  const isLoginRoute = pathname === '/login';
   const { isAuthenticated, signOut } = useAuth();
   const [menuVisible, setMenuVisible] = useState(false);
   const [sideMenuVisible, setSideMenuVisible] = useState(false);
-  const sideMenuAnimatedValue = useRef(new Animated.Value(-300)).current;
-
-  useEffect(() => {
-    Animated.timing(sideMenuAnimatedValue, {
-      toValue: sideMenuVisible ? 0 : -300,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-  }, [sideMenuVisible, sideMenuAnimatedValue]);
+  const sideMenuAnimatedValue = useRef(new Animated.Value(-SIDE_MENU_WIDTH)).current;
 
   useEffect(() => {
     setMenuVisible(false);
@@ -49,21 +44,64 @@ function AppNavigator() {
     setMenuVisible(false);
   };
 
-  const openSideMenu = () => {
+  const openSideMenu = useCallback(() => {
+    sideMenuAnimatedValue.stopAnimation();
     setSideMenuVisible(true);
-  };
+    requestAnimationFrame(() => {
+      Animated.timing(sideMenuAnimatedValue, {
+        toValue: 0,
+        duration: 240,
+        useNativeDriver: true,
+      }).start();
+    });
+  }, [sideMenuAnimatedValue]);
 
   const closeSideMenu = () => {
-    setSideMenuVisible(false);
+    sideMenuAnimatedValue.stopAnimation();
+    Animated.timing(sideMenuAnimatedValue, {
+      toValue: -SIDE_MENU_WIDTH,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(({ finished }) => {
+      if (finished) {
+        setSideMenuVisible(false);
+      }
+    });
   };
+
+  const edgeSwipeResponder = useMemo(
+    () =>
+      PanResponder.create({
+      onStartShouldSetPanResponder: (evt) => {
+        if (isLoginRoute || sideMenuVisible) {
+          return false;
+        }
+        return evt.nativeEvent.pageX <= 24;
+      },
+      onMoveShouldSetPanResponder: (_evt, gestureState) => {
+        if (isLoginRoute || sideMenuVisible) {
+          return false;
+        }
+        return gestureState.dx > 12;
+      },
+      onPanResponderRelease: (_evt, gestureState) => {
+        if (gestureState.dx > 24) {
+          openSideMenu();
+        }
+      },
+    }),
+    [isLoginRoute, openSideMenu, sideMenuVisible]
+  );
 
   const handleNavigate = (path: '/profile' | '/settings') => {
     closeMenu();
+    closeSideMenu();
     router.push(path);
   };
 
   const handleSignOut = async () => {
     closeMenu();
+    closeSideMenu();
     await signOut();
     router.replace('/login');
   };
@@ -89,7 +127,7 @@ function AppNavigator() {
             headerStyle: { backgroundColor: colors.background },
             headerTintColor: colors.text,
             headerShadowVisible: true,
-            headerRight: pathname === '/login' ? undefined : () => (
+            headerRight: isLoginRoute ? undefined : () => (
               <Pressable
                 testID="topbar-menu-button"
                 accessibilityRole="button"
@@ -132,9 +170,8 @@ function AppNavigator() {
 
         <Modal transparent animationType="none" visible={sideMenuVisible} onRequestClose={closeSideMenu}>
           <Pressable style={styles.sideMenuBackdrop} onPress={closeSideMenu}>
-            <Pressable
+            <Animated.View
               testID="side-menu"
-              onPress={() => {}}
               style={[
                 styles.sideMenu,
                 {
@@ -144,6 +181,7 @@ function AppNavigator() {
                 },
               ]}
             >
+              <Pressable onPress={() => {}}>
               <Pressable
                 onPress={closeSideMenu}
                 style={styles.sideMenuClose}
@@ -154,9 +192,16 @@ function AppNavigator() {
               <MenuItem label="Perfil" onPress={() => handleNavigate('/profile')} />
               <MenuItem label="Configurações" onPress={() => handleNavigate('/settings')} />
               {isAuthenticated ? <MenuItem label="Sair" danger onPress={handleSignOut} /> : null}
-            </Pressable>
+              </Pressable>
+            </Animated.View>
           </Pressable>
         </Modal>
+
+        <View
+          pointerEvents={isLoginRoute || sideMenuVisible ? 'none' : 'auto'}
+          style={styles.edgeSwipeZone}
+          {...edgeSwipeResponder.panHandlers}
+        />
 
         <StatusBar style="auto" />
       </ThemeProvider>
@@ -224,5 +269,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     alignItems: 'flex-start',
+  },
+  edgeSwipeZone: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 24,
+    zIndex: 5,
   },
 });

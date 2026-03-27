@@ -15,8 +15,17 @@ function normalizeEnvUrl(value?: string): string | undefined {
   return value.trim().replace(/^['\"]|['\"]$/g, '');
 }
 
+function normalizeEnvBoolean(value?: string): boolean {
+  if (!value) {
+    return false;
+  }
+
+  const normalized = value.trim().replace(/^['\"]|['\"]$/g, '').toLowerCase();
+  return normalized === 'true' || normalized === '1';
+}
+
 const API_URL = normalizeEnvUrl(process.env.EXPO_PUBLIC_API_URL);
-const USE_MOCK_API = process.env.EXPO_PUBLIC_USE_MOCK_API === 'true';
+const USE_MOCK_API = normalizeEnvBoolean(process.env.EXPO_PUBLIC_USE_MOCK_API);
 let interceptorInitialized = false;
 
 function sleep(ms: number): Promise<void> {
@@ -25,8 +34,9 @@ function sleep(ms: number): Promise<void> {
 
 function mockAuthLogin(credentials: LoginCredentials): LoginResponse {
   const username = credentials.username.trim().toLowerCase();
+  const password = credentials.password.trim();
 
-  if (username === 'alexandre' && credentials.password === 'senha') {
+  if (username === 'alexandre' && password === 'senha') {
     return {
       token: 'mock-jwt-token-demo',
       user: {
@@ -68,6 +78,10 @@ function getRequestUrl(input: RequestInfo | URL): string {
 }
 
 function shouldInterceptUrl(url: string): boolean {
+  if (USE_MOCK_API) {
+    return url === '/auth/login' || url.endsWith('/auth/login');
+  }
+
   if (API_URL) {
     return url.startsWith(API_URL) && url.endsWith('/auth/login');
   }
