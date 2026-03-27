@@ -1,9 +1,11 @@
+import tamaguiConfig from '@/tamagui.config';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text } from 'react-native';
 import 'react-native-reanimated';
+import { TamaguiProvider } from 'tamagui';
 
 import { AuthProvider, useAuth } from '@/components/auth-provider';
 import { IconSymbol } from '@/components/ui/icon-symbol';
@@ -48,57 +50,59 @@ function AppNavigator() {
   };
 
   return (
-    <ThemeProvider value={DefaultTheme}>
-      <Stack
-        screenOptions={{
-          headerTitle: 'App Payments',
-          headerTitleAlign: 'left',
-          headerStyle: { backgroundColor: colors.background },
-          headerTintColor: colors.text,
-          headerShadowVisible: true,
-          headerRight: () => (
+    <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
+      <ThemeProvider value={DefaultTheme}>
+        <Stack
+          screenOptions={{
+            headerTitle: 'App Payments',
+            headerTitleAlign: 'left',
+            headerStyle: { backgroundColor: colors.background },
+            headerTintColor: colors.text,
+            headerShadowVisible: true,
+            headerRight: pathname === '/login' ? undefined : () => (
+              <Pressable
+                testID="topbar-menu-button"
+                accessibilityRole="button"
+                accessibilityLabel="Abrir menu"
+                hitSlop={8}
+                style={styles.headerMenuButton}
+                onPress={openMenu}
+              >
+                <IconSymbol name="line.3.horizontal" size={22} color={colors.text} />
+              </Pressable>
+            ),
+          }}
+        >
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="dashboard" />
+          <Stack.Screen name="login" options={{ headerShown: false }} />
+          <Stack.Screen name="profile" options={{ title: 'Perfil' }} />
+          <Stack.Screen name="settings" options={{ title: 'Configurações' }} />
+        </Stack>
+
+        <Modal transparent animationType="fade" visible={menuVisible} onRequestClose={closeMenu}>
+          <Pressable style={styles.backdrop} onPress={closeMenu}>
             <Pressable
-              testID="topbar-menu-button"
-              accessibilityRole="button"
-              accessibilityLabel="Abrir menu"
-              hitSlop={8}
-              style={styles.headerMenuButton}
-              onPress={openMenu}
+              testID="topbar-menu"
+              onPress={() => {}}
+              style={[
+                styles.menuCard,
+                {
+                  backgroundColor: colors.background,
+                  borderColor: '#e5e7eb',
+                },
+              ]}
             >
-              <IconSymbol name="line.3.horizontal" size={22} color={colors.text} />
+              <MenuItem label="Perfil" onPress={() => handleNavigate('/profile')} />
+              <MenuItem label="Configurações" onPress={() => handleNavigate('/settings')} />
+              {isAuthenticated ? <MenuItem label="Sair" danger onPress={handleSignOut} /> : null}
             </Pressable>
-          ),
-        }}
-      >
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="dashboard" />
-        <Stack.Screen name="login" />
-        <Stack.Screen name="profile" options={{ title: 'Perfil' }} />
-        <Stack.Screen name="settings" options={{ title: 'Configurações' }} />
-      </Stack>
-
-      <Modal transparent animationType="fade" visible={menuVisible} onRequestClose={closeMenu}>
-        <Pressable style={styles.backdrop} onPress={closeMenu}>
-          <Pressable
-            testID="topbar-menu"
-            onPress={() => {}}
-            style={[
-              styles.menuCard,
-              {
-                backgroundColor: colors.background,
-                borderColor: '#e5e7eb',
-              },
-            ]}
-          >
-            <MenuItem label="Perfil" onPress={() => handleNavigate('/profile')} />
-            <MenuItem label="Configurações" onPress={() => handleNavigate('/settings')} />
-            {isAuthenticated ? <MenuItem label="Sair" danger onPress={handleSignOut} /> : null}
           </Pressable>
-        </Pressable>
-      </Modal>
+        </Modal>
 
-      <StatusBar style="auto" />
-    </ThemeProvider>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </TamaguiProvider>
   );
 }
 
