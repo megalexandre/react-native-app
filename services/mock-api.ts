@@ -34,6 +34,7 @@ function mockAuthLogin(credentials: LoginCredentials): LoginResponse {
         username: 'alexandre',
         name: 'Alexandre',
       },
+      role: 'admin',
     };
   }
 

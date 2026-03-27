@@ -4,7 +4,6 @@ import {
   TextInput as RNTextInput,
   StyleSheet,
   TextInputProps,
-  useColorScheme,
   View,
 } from 'react-native';
 import { ThemedText } from '../themed-text';
@@ -17,8 +16,7 @@ interface CustomTextInputProps extends TextInputProps {
 }
 
 export function TextInput({ label, error, labelTestID, errorTestID, testID, ...props }: CustomTextInputProps) {
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+  const colors = Colors.light;
   const resolvedLabelTestID = labelTestID ?? (testID ? `${testID}-label` : undefined);
   const resolvedErrorTestID = errorTestID ?? (testID ? `${testID}-error` : undefined);
   const resolvedContainerTestID = testID ? `${testID}-container` : undefined;
@@ -26,7 +24,7 @@ export function TextInput({ label, error, labelTestID, errorTestID, testID, ...p
   return (
     <View testID={resolvedContainerTestID} style={styles.container}>
       {label && <ThemedText testID={resolvedLabelTestID} type="subtitle" style={styles.label}>{label}</ThemedText>}
-      <RNTextInput testID={testID} {...props} style={[styles.input, { color: colors.text, borderColor: error ? '#ff4444' : colors.icon, backgroundColor: colorScheme === 'dark' ? '#2a2a2a' : '#f5f5f5' }]} placeholderTextColor={colors.icon} />
+      <RNTextInput testID={testID} {...props} style={[styles.input, { color: colors.text, borderColor: error ? '#ff4444' : colors.icon, backgroundColor: '#f5f5f5' }]} placeholderTextColor={colors.icon} />
       {error && <ThemedText testID={resolvedErrorTestID} style={styles.error}>{error}</ThemedText>}
     </View>
   );

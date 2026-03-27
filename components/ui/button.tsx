@@ -1,12 +1,12 @@
 import { Colors } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import React from 'react';
 import {
-    ActivityIndicator,
-    StyleSheet,
-    TextStyle,
-    TouchableOpacity,
-    useColorScheme,
-    ViewStyle,
+  ActivityIndicator,
+  StyleSheet,
+  TextStyle,
+  TouchableOpacity,
+  ViewStyle,
 } from 'react-native';
 import { ThemedText } from '../themed-text';
 

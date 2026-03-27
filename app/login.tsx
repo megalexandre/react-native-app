@@ -12,14 +12,12 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  useColorScheme,
   View,
 } from 'react-native';
 
 export default function LoginScreen() {
   const isWeb = Platform.OS === 'web';
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+  const colors = Colors.light;
   const router = useRouter();
   const { isAuthenticated, isLoading: isRestoringSession, signIn } = useAuth();
 
@@ -118,8 +116,8 @@ export default function LoginScreen() {
             isWeb ? styles.contentWeb : null,
             isWeb
               ? {
-                  backgroundColor: colorScheme === 'dark' ? '#1f2328' : '#f8fafc',
-                  borderColor: colorScheme === 'dark' ? '#2f343a' : '#e5e7eb',
+                  backgroundColor: '#f8fafc',
+                  borderColor: '#e5e7eb',
                 }
               : null,
           ]}

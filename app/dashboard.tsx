@@ -1,13 +1,10 @@
 import { Redirect } from 'expo-router';
-import { ScrollView, StyleSheet, useColorScheme } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 
 import { useAuth } from '@/components/auth-provider';
 import { ThemedView } from '@/components/themed-view';
-import { Colors } from '@/constants/theme';
 
 export default function DashboardScreen() {
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
@@ -23,9 +20,8 @@ export default function DashboardScreen() {
       testID="home-screen"
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
-      style={{ backgroundColor: colors.background }}
     >
-      <ThemedView style={styles.container}></ThemedView>
+      <ThemedView></ThemedView>
     </ScrollView>
   );
 }
