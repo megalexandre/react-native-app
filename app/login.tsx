@@ -78,7 +78,7 @@ export default function LoginScreen() {
         password,
       });
       await signIn(session);
-      router.replace('/(tabs)');
+      router.replace('/dashboard');
     } catch (error: unknown) {
       const message =
         error instanceof AuthError
@@ -101,7 +101,7 @@ export default function LoginScreen() {
   }
 
   if (isAuthenticated) {
-    return <Redirect href="/(tabs)" />;
+    return <Redirect href="/dashboard" />;
   }
 
   return (
