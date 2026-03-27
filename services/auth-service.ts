@@ -1,15 +1,7 @@
 import { AuthError, LoginCredentials, LoginResponse } from '@/services/auth-model';
 import { httpPost } from '@/services/http-client';
 
-function normalizeEnvUrl(value?: string): string | undefined {
-  if (!value) {
-    return undefined;
-  }
-
-  return value.trim().replace(/^['\"]|['\"]$/g, '');
-}
-
-const API_URL = normalizeEnvUrl(process.env.EXPO_PUBLIC_API_URL);
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export async function login(credentials: LoginCredentials): Promise<LoginResponse> {
   try {
@@ -20,6 +12,7 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
     }
 
     return payload as LoginResponse;
+    
   } catch (error: any) {
     const message = error.message || error.error || 'Falha ao autenticar';
     throw new AuthError(message, error.status);
