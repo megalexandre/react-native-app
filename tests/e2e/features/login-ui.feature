@@ -7,23 +7,23 @@ Feature: Login
   Background: 
     Given I open the login screen in the browser
 
-  Scenario: Successful login from UI
+  Scenario: Successful login 
    
-    When I type username "admin" and password "123456"
+    When I type username "alexandre" and password "senha"
     And I click the login button
     Then I should see the welcome screen
 
-  Scenario: Failed login from UI
-    When I type username "admin" and password "senha-incorreta"
+  Scenario: Failed login
+    When I type username "alexandre" and password "senha-incorreta"
     And I click the login button
     Then I should see the login toast message "Usuário ou senha inválidos."
 
-  Scenario: Attempt without name
+  Scenario: Failed login attempt without name
     When I type username "" and password "123456"
     And I click the login button
     Then I should see the login error message "Usuário é obrigatório"
 
-  Scenario: Attempt without password
-    When I type username "admin" and password ""
+  Scenario: Failed login attempt without password
+    When I type username "alexandre" and password ""
     And I click the login button
     Then I should see the login error message "Senha é obrigatória"

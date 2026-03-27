@@ -1,10 +1,11 @@
+import { useAuth } from '@/components/auth-provider';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { TextInput } from '@/components/ui/text-input';
 import { Colors } from '@/constants/theme';
 import { AuthError } from '@/services/auth-model';
 import { login } from '@/services/auth-service';
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -20,6 +21,7 @@ export default function LoginScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
   const router = useRouter();
+  const { isAuthenticated, isLoading: isRestoringSession, signIn } = useAuth();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -71,10 +73,11 @@ export default function LoginScreen() {
     setLoading(true);
 
     try {
-      await login({
+      const session = await login({
         username: username.trim(),
         password,
       });
+      await signIn(session);
       router.replace('/(tabs)');
     } catch (error: unknown) {
       const message =
@@ -92,6 +95,14 @@ export default function LoginScreen() {
       setLoading(false);
     }
   };
+
+  if (isRestoringSession) {
+    return null;
+  }
+
+  if (isAuthenticated) {
+    return <Redirect href="/(tabs)" />;
+  }
 
   return (
     <KeyboardAvoidingView
