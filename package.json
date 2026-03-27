@@ -8,7 +8,12 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "test:integration": "node --import tsx ./node_modules/@cucumber/cucumber/bin/cucumber-js tests/integration/features/**/*.feature --import tests/integration/steps/**/*.ts",
+    "web:test": "cross-env CI=1 BROWSER=none EXPO_NO_WEB_BROWSER=1 EXPO_PUBLIC_USE_MOCK_API=true expo start --web --port 8081",
+    "test:e2e:run": "bash -lc 'set -e; for f in tests/e2e/features/*.feature; do node --import tsx ./node_modules/@cucumber/cucumber/bin/cucumber-js \"$f\" --import tests/e2e/steps/**/*.ts; done'",
+    "test:e2e": "start-server-and-test web:test http://localhost:8081 test:e2e:run",
+    "cucumber": "npm run test:e2e"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -31,17 +36,22 @@
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
     "react-native-gesture-handler": "~2.28.0",
-    "react-native-worklets": "0.5.1",
     "react-native-reanimated": "~4.1.1",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
-    "react-native-web": "~0.21.0"
+    "react-native-web": "~0.21.0",
+    "react-native-worklets": "0.5.1"
   },
   "devDependencies": {
+    "@cucumber/cucumber": "^12.7.0",
     "@types/react": "~19.1.0",
-    "typescript": "~5.9.2",
+    "cross-env": "^10.1.0",
     "eslint": "^9.25.0",
-    "eslint-config-expo": "~10.0.0"
+    "eslint-config-expo": "~10.0.0",
+    "playwright": "^1.58.2",
+    "start-server-and-test": "^2.1.5",
+    "tsx": "^4.21.0",
+    "typescript": "~5.9.2"
   },
   "private": true
 }
