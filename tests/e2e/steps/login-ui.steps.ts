@@ -37,8 +37,18 @@ Then('I should see the welcome screen', async function () {
 });
 
 Then('I should see the login error message {string}', async function (expectedMessage: string) {
-  const errorText = page.getByTestId('login-password-error');
+  const isUsernameMessage = expectedMessage.toLowerCase().includes('usuário');
+  const targetTestId = isUsernameMessage ? 'login-username-error' : 'login-password-error';
+  const errorText = page.getByTestId(targetTestId);
   await errorText.waitFor({ state: 'visible' });
   const actualMessage = (await errorText.textContent())?.trim();
+  assert.equal(actualMessage, expectedMessage);
+});
+
+Then('I should see the login toast message {string}', async function (expectedMessage: string) {
+  await page.getByTestId('login-toast').waitFor({ state: 'visible' });
+  const toastText = page.getByTestId('login-toast-message');
+  await toastText.waitFor({ state: 'visible' });
+  const actualMessage = (await toastText.textContent())?.trim();
   assert.equal(actualMessage, expectedMessage);
 });

@@ -26,24 +26,13 @@ function sleep(ms: number): Promise<void> {
 function mockAuthLogin(credentials: LoginCredentials): LoginResponse {
   const username = credentials.username.trim().toLowerCase();
 
-  if (username === 'admin' && credentials.password === '123456') {
-    return {
-      token: 'mock-jwt-token',
-      user: {
-        id: '1',
-        username: 'admin',
-        name: 'Administrador',
-      },
-    };
-  }
-
-  if (username === 'demo' && credentials.password === '123456') {
+  if (username === 'alexandre' && credentials.password === 'senha') {
     return {
       token: 'mock-jwt-token-demo',
       user: {
         id: '2',
-        username: 'demo',
-        name: 'Usuario Demo',
+        username: 'alexandre',
+        name: 'Alexandre',
       },
     };
   }

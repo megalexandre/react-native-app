@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Start Expo Web",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run web"
+    },
+    {
+      "name": "Debug Expo Web (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:8081",
+      "webRoot": "${workspaceFolder}"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Expo Web + Chrome",
+      "configurations": [
+        "Start Expo Web",
+        "Debug Expo Web (Chrome)"
+      ],
+      "stopAll": true
+    }
+  ]
+}
