@@ -43,6 +43,7 @@ export function Card({
       backgroundColor="$background"
       borderRadius={14}
       padding={16}
+      data-testid={testID}
       {...(variant === 'outlined'
         ? { borderWidth: 1, borderColor: '$borderColor' }
         : {
@@ -57,21 +58,21 @@ export function Card({
       {...rest}
     >
       {(title || subtitle || rightSlot) && (
-        <XStack testID={resolvedHeaderTestID} alignItems="flex-start" justifyContent="space-between" gap={12}>
+        <XStack testID={resolvedHeaderTestID} data-testid={resolvedHeaderTestID} alignItems="flex-start" justifyContent="space-between" gap={12}>
           <YStack flex={1} gap={4}>
             {title ? (
-              <Text testID={resolvedTitleTestID} fontSize={18} fontWeight="600" lineHeight={24}>
+              <Text testID={resolvedTitleTestID} data-testid={resolvedTitleTestID} fontSize={18} fontWeight="600" lineHeight={24}>
                 {title}
               </Text>
             ) : null}
             {subtitle ? (
-              <Text testID={resolvedSubtitleTestID} fontSize={14} lineHeight={20} color="$color8">
+              <Text testID={resolvedSubtitleTestID} data-testid={resolvedSubtitleTestID} fontSize={14} lineHeight={20} color="$color8">
                 {subtitle}
               </Text>
             ) : null}
           </YStack>
           {rightSlot ? (
-            <YStack testID={resolvedRightSlotTestID} alignItems="flex-end" justifyContent="center">
+            <YStack testID={resolvedRightSlotTestID} data-testid={resolvedRightSlotTestID} alignItems="flex-end" justifyContent="center">
               {rightSlot}
             </YStack>
           ) : null}
@@ -79,13 +80,13 @@ export function Card({
       )}
 
       {children ? (
-        <YStack testID={resolvedContentTestID} marginTop={12} gap={8} style={contentStyle}>
+        <YStack testID={resolvedContentTestID} data-testid={resolvedContentTestID} marginTop={12} gap={8} style={contentStyle}>
           {children}
         </YStack>
       ) : null}
 
       {footer ? (
-        <YStack testID={resolvedFooterTestID} marginTop={14}>
+        <YStack testID={resolvedFooterTestID} data-testid={resolvedFooterTestID} marginTop={14}>
           {footer}
         </YStack>
       ) : null}

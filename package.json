@@ -13,7 +13,9 @@
     "web:test": "cross-env CI=1 BROWSER=none EXPO_NO_WEB_BROWSER=1 EXPO_PUBLIC_USE_MOCK_API=true expo start --web --port 8081",
     "test:e2e:run": "bash -lc 'set -e; for f in tests/e2e/features/*.feature; do node --import tsx ./node_modules/@cucumber/cucumber/bin/cucumber-js \"$f\" --import tests/e2e/steps/**/*.ts; done'",
     "test:e2e": "start-server-and-test web:test http://localhost:8081 test:e2e:run",
-    "cucumber": "npm run test:e2e"
+    "cucumber": "npm run wiremock:up && npm run test:e2e && npm run wiremock:down",
+    "wiremock:up": "docker compose up -d wiremock",
+    "wiremock:down": "docker compose down"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
