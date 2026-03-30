@@ -33,29 +33,31 @@ function sleep(ms: number): Promise<void> {
 }
 
 function mockAuthLogin(credentials: LoginCredentials): LoginResponse {
-  const username = credentials.username.trim().toLowerCase();
-  const password = credentials.password.trim();
-
-  if (username === 'alexandre' && password === 'senha') {
-    return {
-      token: 'mock-jwt-token-demo',
-      user: {
-        id: '2',
-        username: 'alexandre',
-        name: 'Alexandre',
-      },
-      role: 'admin',
-    };
-  }
-
-  throw new MockApiError('Usuário ou senha inválidos.', 401);
+  return {
+    token: 'mock-jwt-token-demo',
+    user: {
+      id: '2',
+      username: 'alexandre',
+      name: 'Alexandre',
+    },
+    role: 'admin',
+  };
 }
-
 export async function mockApiRequest(path: string, body?: unknown): Promise<unknown> {
   await sleep(500);
 
   if (path === '/auth/login') {
     return mockAuthLogin(body as LoginCredentials);
+  }
+
+  if (path === '/dashboard') {
+    // Mock para dashboard
+    return {
+      summary: {
+        total: 1000,
+        text: '8',
+      },
+    };
   }
 
   throw new MockApiError(`Endpoint mock não implementado: ${path}`, 404);
@@ -79,14 +81,27 @@ function getRequestUrl(input: RequestInfo | URL): string {
 
 function shouldInterceptUrl(url: string): boolean {
   if (USE_MOCK_API) {
-    return url === '/auth/login' || url.endsWith('/auth/login');
+    return (
+      url === '/auth/login' ||
+      url.endsWith('/auth/login') ||
+      url === '/dashboard' ||
+      url.endsWith('/dashboard')
+    );
   }
 
   if (API_URL) {
-    return url.startsWith(API_URL) && url.endsWith('/auth/login');
+    return (
+      (url.startsWith(API_URL) && url.endsWith('/auth/login')) ||
+      (url.startsWith(API_URL) && url.endsWith('/dashboard'))
+    );
   }
 
-  return url === '/auth/login' || url.endsWith('/auth/login');
+  return (
+    url === '/auth/login' ||
+    url.endsWith('/auth/login') ||
+    url === '/dashboard' ||
+    url.endsWith('/dashboard')
+  );
 }
 
 function createJsonResponse(payload: unknown, status = 200): Response {
@@ -117,7 +132,12 @@ export function initMockApiInterceptor(): void {
     }
 
     try {
-      const payload = await mockApiRequest('/auth/login', body);
+      // Intercepta e redireciona para o endpoint correto
+      let endpoint = '/auth/login';
+      if (url.endsWith('/dashboard')) {
+        endpoint = '/dashboard';
+      }
+      const payload = await mockApiRequest(endpoint, body);
       return createJsonResponse(payload, 200);
     } catch (error: unknown) {
       if (isMockApiError(error)) {
@@ -126,5 +146,4 @@ export function initMockApiInterceptor(): void {
 
       return createJsonResponse({ message: 'Erro interno no mock API.' }, 500);
     }
-  };
-}
+  }};

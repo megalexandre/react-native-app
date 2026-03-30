@@ -5,13 +5,13 @@ import { Browser, chromium, Page } from 'playwright';
 let browser: Browser;
 let page: Page;
 
-Before(async function () {
-  browser = await chromium.launch({ headless: false });
+Before({ tags: '@login' }, async function () {
+  browser = await chromium.launch({ headless: true });
   const context = await browser.newContext();
   page = await context.newPage();
 });
 
-After(async function () {
+After({ tags: '@login' }, async function () {
   await page.close();
   await browser.close();
 });
@@ -33,7 +33,7 @@ When('I click the login button', async function () {
 Then('I should see the welcome screen', async function () {
   await page.getByTestId('home-screen').waitFor({ state: 'visible' });
   const url = page.url();
-  assert.ok(url.includes('http://localhost:8081'));
+  assert.ok(url.includes('http://localhost:8081/dashboard'), `Expected to be on dashboard, but was on ${url}`);
 });
 
 Then('I should see the login error message {string}', async function (expectedMessage: string) {

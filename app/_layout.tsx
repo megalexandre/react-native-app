@@ -10,6 +10,8 @@ import { TamaguiProvider } from 'tamagui';
 import { AuthProvider, useAuth } from '@/components/auth-provider';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 const SIDE_MENU_WIDTH = 300;
 
@@ -20,6 +22,7 @@ export default function RootLayout() {
     </AuthProvider>
   );
 }
+
 
 function AppNavigator() {
   const colors = Colors['light'];
@@ -107,105 +110,107 @@ function AppNavigator() {
   };
 
   return (
-    <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
-      <ThemeProvider value={DefaultTheme}>
-        <Stack
-          screenOptions={{
-            headerTitle: () => (
-              <Pressable
-                testID="app-title"
-                accessibilityRole="button"
-                accessibilityLabel="Abrir menu lateral"
-                onPress={openSideMenu}
-              >
-                <Text style={{ fontSize: 18, fontWeight: '600', color: colors.text }}>
-                  App Payments
-                </Text>
-              </Pressable>
-            ),
-            headerTitleAlign: 'left',
-            headerStyle: { backgroundColor: colors.background },
-            headerTintColor: colors.text,
-            headerShadowVisible: true,
-            headerRight: isLoginRoute ? undefined : () => (
-              <Pressable
-                testID="topbar-menu-button"
-                accessibilityRole="button"
-                accessibilityLabel="Abrir menu"
-                hitSlop={8}
-                style={styles.headerMenuButton}
-                onPress={openMenu}
-              >
-                <IconSymbol name="line.3.horizontal" size={22} color={colors.text} />
-              </Pressable>
-            ),
-          }}
-        >
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="dashboard" />
-          <Stack.Screen name="login" options={{ headerShown: false }} />
-          <Stack.Screen name="profile" options={{ title: 'Perfil' }} />
-          <Stack.Screen name="settings" options={{ title: 'Configurações' }} />
-        </Stack>
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+      <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
+        <ThemeProvider value={DefaultTheme}>
+          <Stack
+            screenOptions={{
+              headerTitle: () => (
+                <Pressable
+                  testID="app-title"
+                  accessibilityRole="button"
+                  accessibilityLabel="Abrir menu lateral"
+                  onPress={openSideMenu}
+                >
+                  <Text style={{ fontSize: 18, fontWeight: '600', color: colors.text }}>
+                    App Payments
+                  </Text>
+                </Pressable>
+              ),
+              headerTitleAlign: 'left',
+              headerStyle: { backgroundColor: colors.background },
+              headerTintColor: colors.text,
+              headerShadowVisible: true,
+              headerRight: isLoginRoute ? undefined : () => (
+                <Pressable
+                  testID="topbar-menu-button"
+                  accessibilityRole="button"
+                  accessibilityLabel="Abrir menu"
+                  hitSlop={8}
+                  style={styles.headerMenuButton}
+                  onPress={openMenu}
+                >
+                  <IconSymbol name="line.3.horizontal" size={22} color={colors.text} />
+                </Pressable>
+              ),
+            }}
+          >
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="dashboard" />
+            <Stack.Screen name="login" options={{ headerShown: false }} />
+            <Stack.Screen name="profile" options={{ title: 'Perfil' }} />
+            <Stack.Screen name="settings" options={{ title: 'Configurações' }} />
+          </Stack>
 
-        <Modal transparent animationType="fade" visible={menuVisible} onRequestClose={closeMenu}>
-          <Pressable style={styles.backdrop} onPress={closeMenu}>
-            <Pressable
-              testID="topbar-menu"
-              onPress={() => {}}
-              style={[
-                styles.menuCard,
-                {
-                  backgroundColor: colors.background,
-                  borderColor: '#e5e7eb',
-                },
-              ]}
-            >
-              <MenuItem label="Perfil" onPress={() => handleNavigate('/profile')} />
-              <MenuItem label="Configurações" onPress={() => handleNavigate('/settings')} />
-              {isAuthenticated ? <MenuItem label="Sair" danger onPress={handleSignOut} /> : null}
+          <Modal transparent animationType="fade" visible={menuVisible} onRequestClose={closeMenu}>
+            <Pressable style={styles.backdrop} onPress={closeMenu}>
+              <Pressable
+                testID="topbar-menu"
+                onPress={() => {}}
+                style={[
+                  styles.menuCard,
+                  {
+                    backgroundColor: colors.background,
+                    borderColor: '#e5e7eb',
+                  },
+                ]}
+              >
+                <MenuItem label="Perfil" onPress={() => handleNavigate('/profile')} />
+                <MenuItem label="Configurações" onPress={() => handleNavigate('/settings')} />
+                {isAuthenticated ? <MenuItem label="Sair" danger onPress={handleSignOut} /> : null}
+              </Pressable>
             </Pressable>
-          </Pressable>
-        </Modal>
+          </Modal>
 
-        <Modal transparent animationType="none" visible={sideMenuVisible} onRequestClose={closeSideMenu}>
-          <Pressable style={styles.sideMenuBackdrop} onPress={closeSideMenu}>
-            <Animated.View
-              testID="side-menu"
-              style={[
-                styles.sideMenu,
-                {
-                  backgroundColor: colors.background,
-                  borderColor: '#e5e7eb',
-                  transform: [{ translateX: sideMenuAnimatedValue }],
-                },
-              ]}
-            >
-              <Pressable onPress={() => {}}>
-              <Pressable
-                onPress={closeSideMenu}
-                style={styles.sideMenuClose}
-                testID="side-menu-close"
+          <Modal transparent animationType="none" visible={sideMenuVisible} onRequestClose={closeSideMenu}>
+            <Pressable style={styles.sideMenuBackdrop} onPress={closeSideMenu}>
+              <Animated.View
+                testID="side-menu"
+                style={[
+                  styles.sideMenu,
+                  {
+                    backgroundColor: colors.background,
+                    borderColor: '#e5e7eb',
+                    transform: [{ translateX: sideMenuAnimatedValue }],
+                  },
+                ]}
               >
-                <Text style={{ fontSize: 28, color: colors.text }}>×</Text>
-              </Pressable>
-              <MenuItem label="Perfil" onPress={() => handleNavigate('/profile')} />
-              <MenuItem label="Configurações" onPress={() => handleNavigate('/settings')} />
-              {isAuthenticated ? <MenuItem label="Sair" danger onPress={handleSignOut} /> : null}
-              </Pressable>
-            </Animated.View>
-          </Pressable>
-        </Modal>
+                <Pressable onPress={() => {}}>
+                <Pressable
+                  onPress={closeSideMenu}
+                  style={styles.sideMenuClose}
+                  testID="side-menu-close"
+                >
+                  <Text style={{ fontSize: 28, color: colors.text }}>×</Text>
+                </Pressable>
+                <MenuItem label="Perfil" onPress={() => handleNavigate('/profile')} />
+                <MenuItem label="Configurações" onPress={() => handleNavigate('/settings')} />
+                {isAuthenticated ? <MenuItem label="Sair" danger onPress={handleSignOut} /> : null}
+                </Pressable>
+              </Animated.View>
+            </Pressable>
+          </Modal>
 
-        <View
-          pointerEvents={isLoginRoute || sideMenuVisible ? 'none' : 'auto'}
-          style={styles.edgeSwipeZone}
-          {...edgeSwipeResponder.panHandlers}
-        />
+          <View
+            pointerEvents={isLoginRoute || sideMenuVisible ? 'none' : 'auto'}
+            style={styles.edgeSwipeZone}
+            {...edgeSwipeResponder.panHandlers}
+          />
 
-        <StatusBar style="auto" />
-      </ThemeProvider>
-    </TamaguiProvider>
+          <StatusBar backgroundColor="transparent" translucent style="dark" />
+        </ThemeProvider>
+      </TamaguiProvider>
+    </SafeAreaView>
   );
 }
 

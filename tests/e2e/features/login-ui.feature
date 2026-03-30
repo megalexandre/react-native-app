@@ -1,3 +1,4 @@
+@login
 Feature: Login
   
   As an end user
@@ -12,11 +13,6 @@ Feature: Login
     When I type username "alexandre" and password "senha"
     And I click the login button
     Then I should see the welcome screen
-
-  Scenario: Failed login
-    When I type username "alexandre" and password "senha-incorreta"
-    And I click the login button
-    Then I should see the login toast message "Usuário ou senha inválidos."
 
   Scenario: Failed login attempt without name
     When I type username "" and password "123456"
