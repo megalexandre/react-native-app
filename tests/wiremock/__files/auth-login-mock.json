@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/auth/login"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "token": "mock-jwt-token-demo",
+      "user": {
+        "id": "2",
+        "username": "alexandre",
+        "name": "Alexandre"
+      },
+      "role": "admin"
+    }
+  }
+}

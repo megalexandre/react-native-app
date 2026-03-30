@@ -111,39 +111,8 @@ function createJsonResponse(payload: unknown, status = 200): Response {
   });
 }
 
+// Interceptor desabilitado: as chamadas agora vão para o endpoint real (WireMock)
 export function initMockApiInterceptor(): void {
-  if (interceptorInitialized || (!USE_MOCK_API && API_URL)) {
-    return;
-  }
+  // Não faz mais nada
+}
 
-  interceptorInitialized = true;
-  const originalFetch = global.fetch.bind(global);
-
-  global.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-    const url = getRequestUrl(input);
-
-    if (!shouldInterceptUrl(url)) {
-      return originalFetch(input, init);
-    }
-
-    let body: unknown;
-    if (init?.body && typeof init.body === 'string') {
-      body = JSON.parse(init.body);
-    }
-
-    try {
-      // Intercepta e redireciona para o endpoint correto
-      let endpoint = '/auth/login';
-      if (url.endsWith('/dashboard')) {
-        endpoint = '/dashboard';
-      }
-      const payload = await mockApiRequest(endpoint, body);
-      return createJsonResponse(payload, 200);
-    } catch (error: unknown) {
-      if (isMockApiError(error)) {
-        return createJsonResponse({ message: error.message }, error.status);
-      }
-
-      return createJsonResponse({ message: 'Erro interno no mock API.' }, 500);
-    }
-  }};
